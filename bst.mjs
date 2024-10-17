@@ -57,7 +57,43 @@ class Tree {
     }
   }
 
-  deleteItem(value) {}
+  find(value) {
+    let currentNode = this.#root;
+
+    while (currentNode) {
+      if (currentNode.data === value) {
+        return currentNode;
+      } else if (currentNode.data > value) {
+        currentNode = currentNode.left;
+      } else {
+        currentNode = currentNode.right;
+      }
+    }
+    return null;
+  }
+
+  deleteItem(value) {
+    let currentNode = this.#root;
+
+    while (currentNode) {
+      if (currentNode.left.data === value) {
+        if (currentNode.left.left === null && currentNode.left.right === null)
+          currentNode.left = null;
+        return;
+      } else if (currentNode.right.data === value) {
+        if (currentNode.right.left === null && currentNode.right.right === null)
+          currentNode.right = null;
+        return;
+      } else {
+        if (currentNode.data > value) {
+          currentNode = currentNode.left;
+        } else {
+          currentNode = currentNode.right;
+        }
+      }
+    }
+    return null;
+  }
 }
 
 function removeDuplicates(array) {
