@@ -9,31 +9,55 @@ class Node {
 }
 
 class Tree {
-  #data;
-  #array;
+  #root;
+
   constructor(array) {
-    this.#array = array;
-    this.#data = buildTree(array);
+    this.#root = this.buildTree(mergeSort(removeDuplicates(array)));
   }
 
-  get data() {
-    return this.#data;
+  get root() {
+    return this.#root;
   }
-}
 
-function buildTree(array) {
-  if (Array.isArray(array)) {
-    const newArray = mergeSort(removeDuplicates(array));
-    const midPoint = Math.floor(newArray.length / 2);
-    const root = new Node(newArray[midPoint]);
+  buildTree(array) {
+    if (Array.isArray(array)) {
+      const midPoint = Math.floor(array.length / 2);
+      const root = new Node(array[midPoint]);
 
-    if (newArray.length === 0) return null;
-    if (newArray.length > 1) {
-      root.left = buildTree(newArray.slice(0, midPoint));
-      root.right = buildTree(newArray.slice(midPoint + 1));
+      if (array.length === 0) return null;
+      if (array.length > 1) {
+        root.left = this.buildTree(array.slice(0, midPoint));
+        root.right = this.buildTree(array.slice(midPoint + 1));
+      }
+      return root;
     }
-    return root;
   }
+
+  insert(value) {
+    let currentNode = this.#root;
+
+    while (currentNode) {
+      if (currentNode.data === value) {
+        return;
+      } else if (currentNode.data > value) {
+        if (currentNode.left) {
+          currentNode = currentNode.left;
+        } else {
+          currentNode.left = new Node(value);
+          return;
+        }
+      } else {
+        if (currentNode.right) {
+          currentNode = currentNode.right;
+        } else {
+          currentNode.right = new Node(value);
+          return;
+        }
+      }
+    }
+  }
+
+  deleteItem(value) {}
 }
 
 function removeDuplicates(array) {
@@ -53,10 +77,4 @@ const prettyPrint = (node, prefix = "", isLeft = true) => {
   }
 };
 
-const tree = new Tree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]);
-
-// console.log(tree.data);
-
-// console.log(buildTree([1, 7, 4, 23, 8, 9, 4, 3, 5, 7, 9, 67, 6345, 324]));
-
-console.log(prettyPrint(tree.data));
+export { prettyPrint, Tree };
