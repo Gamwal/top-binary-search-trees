@@ -10,6 +10,22 @@ class Node {
 
 class Tree {
   #root;
+  #isLeaf(node) {
+    return node.left === null && node.right === null;
+  }
+
+  #hasOneChild(node) {
+    if (!node.left && node.right) return node.right;
+    else if (node.left && !node.right) return node.left;
+    return null;
+  }
+
+  #findMinNode(node) {
+    while (node.left) {
+      node = node.left;
+    }
+    return node;
+  }
 
   constructor(array) {
     this.#root = this.buildTree(mergeSort(removeDuplicates(array)));
@@ -72,34 +88,31 @@ class Tree {
     return null;
   }
 
-  isLeaf(node) {
-    if (node.left === null && node.right === null) return true;
-  }
-
-  hasOneChild(node) {
-    if (node.left === null || node.right === null) {
-      if (node.left === null && node.right) return node.right;
-      else if (node.left && node.right === null) return node.left;
-    }
-    return null;
-  }
-
   deleteItem(value) {
     let currentNode = this.#root;
+    let parentNode = null;
 
     while (currentNode) {
       if (currentNode.left && currentNode.left.data === value) {
-        if (this.isLeaf(currentNode.left)) {
+        if (this.#isLeaf(currentNode.left)) {
           currentNode.left = null;
-        } else if (this.hasOneChild(currentNode.left)) {
-          currentNode.left = this.hasOneChild(currentNode.left);
+        } else if (this.#hasOneChild(currentNode.left)) {
+          currentNode.left = this.#hasOneChild(currentNode.left);
+        } else {
+          let data = this.#findMinNode(currentNode.left).data;
+          this.deleteItem(data);
+          currentNode.left.data = data;
         }
         return;
       } else if (currentNode.right && currentNode.right.data === value) {
-        if (this.isLeaf(currentNode.right)) {
+        if (this.#isLeaf(currentNode.right)) {
           currentNode.right = null;
-        } else if (this.hasOneChild(currentNode.right)) {
-          currentNode.right = this.hasOneChild(currentNode.right);
+        } else if (this.#hasOneChild(currentNode.right)) {
+          currentNode.right = this.#hasOneChild(currentNode.right);
+        } else {
+          let data = this.#findMinNode(currentNode.right).data;
+          this.deleteItem(data);
+          currentNode.right.data = data;
         }
         return;
       } else {
@@ -111,6 +124,38 @@ class Tree {
       }
     }
     return null;
+  }
+
+  levelOrder(callback) {
+    if (typeof callback !== "function") throw new Error("callback required");
+
+    let queue = [];
+    queue.push(this.#root);
+
+    while (queue.length > 0) {
+      let currentNode = queue.shift();
+      if (currentNode.left) queue.push(currentNode.left);
+      if (currentNode.right) queue.push(currentNode.right);
+      callback(currentNode);
+    }
+  }
+
+  inOrder(callback) {
+    if (typeof callback !== "function") throw new Error("callback required");
+
+    let currentNode = this.#root;
+    let stack = [];
+
+    while (stack.length > 0 || currentNode) {
+      while (currentNode) {
+        stack.push(currentNode);
+        currentNode = currentNode.left;
+      }
+      currentNode = stack.pop();
+      callback(currentNode);
+
+      currentNode = currentNode.right;
+    }
   }
 }
 
