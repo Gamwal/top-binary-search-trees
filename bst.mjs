@@ -72,17 +72,35 @@ class Tree {
     return null;
   }
 
+  isLeaf(node) {
+    if (node.left === null && node.right === null) return true;
+  }
+
+  hasOneChild(node) {
+    if (node.left === null || node.right === null) {
+      if (node.left === null && node.right) return node.right;
+      else if (node.left && node.right === null) return node.left;
+    }
+    return null;
+  }
+
   deleteItem(value) {
     let currentNode = this.#root;
 
     while (currentNode) {
-      if (currentNode.left.data === value) {
-        if (currentNode.left.left === null && currentNode.left.right === null)
+      if (currentNode.left && currentNode.left.data === value) {
+        if (this.isLeaf(currentNode.left)) {
           currentNode.left = null;
+        } else if (this.hasOneChild(currentNode.left)) {
+          currentNode.left = this.hasOneChild(currentNode.left);
+        }
         return;
-      } else if (currentNode.right.data === value) {
-        if (currentNode.right.left === null && currentNode.right.right === null)
+      } else if (currentNode.right && currentNode.right.data === value) {
+        if (this.isLeaf(currentNode.right)) {
           currentNode.right = null;
+        } else if (this.hasOneChild(currentNode.right)) {
+          currentNode.right = this.hasOneChild(currentNode.right);
+        }
         return;
       } else {
         if (currentNode.data > value) {
