@@ -178,6 +178,19 @@ class Tree {
     }
     return null;
   }
+
+  isBalanced() {
+    const lefthHeight = this.height(this.#root.left);
+    const righthHeight = this.height(this.#root.right);
+    return Math.abs(lefthHeight - righthHeight) <= 1;
+  }
+
+  rebalance() {
+    const arr = [];
+    this.inOrder((node) => arr.push(node.data));
+    const newTree = new Tree(arr);
+    this.#root = newTree.root;
+  }
 }
 
 function removeDuplicates(array) {
