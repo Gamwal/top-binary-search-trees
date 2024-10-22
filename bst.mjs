@@ -93,29 +93,22 @@ class Tree {
     let parentNode = null;
 
     while (currentNode) {
-      if (currentNode.left && currentNode.left.data === value) {
-        if (this.#isLeaf(currentNode.left)) {
-          currentNode.left = null;
-        } else if (this.#hasOneChild(currentNode.left)) {
-          currentNode.left = this.#hasOneChild(currentNode.left);
+      if (currentNode.data === value) {
+        if (this.#isLeaf(currentNode)) {
+          if (currentNode === parentNode.left) parentNode.left = null;
+          else parentNode.right = null;
+        } else if (this.#hasOneChild(currentNode)) {
+          if (currentNode === parentNode.left)
+            parentNode.left = this.#hasOneChild(currentNode);
+          else parentNode.right = this.#hasOneChild(currentNode);
         } else {
-          let data = this.#findMinNode(currentNode.left).data;
-          this.deleteItem(data);
-          currentNode.left.data = data;
-        }
-        return;
-      } else if (currentNode.right && currentNode.right.data === value) {
-        if (this.#isLeaf(currentNode.right)) {
-          currentNode.right = null;
-        } else if (this.#hasOneChild(currentNode.right)) {
-          currentNode.right = this.#hasOneChild(currentNode.right);
-        } else {
-          let data = this.#findMinNode(currentNode.right).data;
-          this.deleteItem(data);
-          currentNode.right.data = data;
+          const repl = this.#findMinNode(currentNode.right);
+          this.deleteItem(repl.data);
+          currentNode.data = repl.data;
         }
         return;
       } else {
+        parentNode = currentNode;
         if (currentNode.data > value) {
           currentNode = currentNode.left;
         } else {
@@ -140,22 +133,31 @@ class Tree {
     }
   }
 
-  inOrder(callback) {
+  inOrder(callback, node = this.#root) {
     if (typeof callback !== "function") throw new Error("callback required");
 
-    let currentNode = this.#root;
-    let stack = [];
+    if (node === null) return;
+    this.inOrder(callback, node.left);
+    callback(node);
+    this.inOrder(callback, node.right);
+  }
 
-    while (stack.length > 0 || currentNode) {
-      while (currentNode) {
-        stack.push(currentNode);
-        currentNode = currentNode.left;
-      }
-      currentNode = stack.pop();
-      callback(currentNode);
+  preOrder(callback, node = this.#root) {
+    if (typeof callback !== "function") throw new Error("callback required");
 
-      currentNode = currentNode.right;
-    }
+    if (node === null) return;
+    callback(node);
+    this.preOrder(callback, node.left);
+    this.preOrder(callback, node.right);
+  }
+
+  postOrder(callback, node = this.#root) {
+    if (typeof callback !== "function") throw new Error("callback required");
+
+    if (node === null) return;
+    this.postOrder(callback, node.left);
+    this.postOrder(callback, node.right);
+    callback(node);
   }
 }
 
